@@ -115,7 +115,7 @@ void CThread::cancel(bool bWaitFlag)
 //=============================================================================
 // Constructor() - Initializes the mutex
 //=============================================================================
-PCriticalSection::PCriticalSection()
+CMutex::CMutex()
 {
     pthread_mutexattr_t attributes;
 

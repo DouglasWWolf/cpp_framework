@@ -6,16 +6,16 @@
 
 
 //=============================================================================
-// PCriticalSection() - Implement a critical-section mutex.  These should
-//                      NEVER be declared on the stack (because they will
-//                      be ineffective)
+// CMutex() - Implement a critical-section mutex.  These should
+//            NEVER be declared on the stack (because they will
+//            be ineffective)
 //=============================================================================
-class PCriticalSection
+class CMutex
 {
 public:
 
     // Constructor() - Initializes the mutex
-    PCriticalSection();
+    CMutex();
 
     // Waits until a lock is obtained on the mutex
     void    lock()      {pthread_mutex_lock(&m_mutex);}
@@ -34,16 +34,16 @@ protected:
 
 
 //=============================================================================
-// PSingleLock - Use these to perform convenient locking of PCriticalSections
+// CSingleLock - Use these to perform convenient locking of CMutex objects
 //
 // Note: These are intended to be created on the stack
 //=============================================================================
-class PSingleLock
+class CSingleLock
 {
 public:
 
     // Constructor
-    PSingleLock(PCriticalSection *cs, bool lock_now = true)
+    CSingleLock(CMutex *cs, bool lock_now = true)
     {
         m_is_locked = false;
         m_cs = cs;
@@ -51,7 +51,7 @@ public:
     }
 
     // Destructor, unlocks the mutex
-    ~PSingleLock() {unlock();}
+    ~CSingleLock() {unlock();}
 
     // Call this to lock the mutex
     void    lock()
@@ -76,8 +76,8 @@ public:
     }
 
 protected:
-    PCriticalSection*   m_cs;
-    bool                m_is_locked;
+    CMutex*   m_cs;
+    bool      m_is_locked;
 };
 //=============================================================================
 
