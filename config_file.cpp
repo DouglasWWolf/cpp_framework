@@ -47,8 +47,8 @@ static bool parse_bool(const char* in)
 //==========================================================================================================
 // decode() - Converts a std::string into some other type
 //==========================================================================================================
-static void decode(const string& s, int32_t *p_result) {*p_result = (int32_t)strtoul(s.c_str(), NULL, 0);}
-static void decode(const string& s, double  *p_result) {*p_result = strtod(s.c_str(), nullptr);}
+static void decode(const string& s, int32_t *p_result) {*p_result = (int32_t)stoi(s, nullptr, 0);}
+static void decode(const string& s, double  *p_result) {*p_result = stod(s);}
 static void decode(const string& s, string  *p_result) {*p_result = s;}
 static void decode(const string& s, bool    *p_result) {*p_result = parse_bool(s.c_str());}
 //==========================================================================================================

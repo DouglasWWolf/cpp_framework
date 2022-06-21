@@ -129,7 +129,7 @@ bool CCmdLine::has_switch(string name, int* param)
     // If this switch was used, translate its parameter into an integer
     if (has_switch(name, &token))
     {   
-        *param = strtol(token.c_str(), nullptr, 0);
+        *param = stoi(token, nullptr, 0);
         return true;        
     }
 
