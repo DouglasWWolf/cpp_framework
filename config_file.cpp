@@ -35,8 +35,11 @@ static bool parse_bool(const char* in)
     string s = in;
     make_lower(s);
 
-    // The word "true", always means 'true';
+    // The word "true" always means 'true'
     if (s == "true") return true;
+
+    // The word "on" always means 'true'
+    if (s == "on") return true;
 
     // Anything else means 'false'
     return false;
