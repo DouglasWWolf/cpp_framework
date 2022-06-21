@@ -149,7 +149,7 @@ bool CCmdLine::has_switch(string name, double* param)
     // If this switch was used, translate its parameter into an floating-point value
     if (has_switch(name, &token))
     {   
-        *param = strtod(token.c_str(), nullptr);
+        *param = stod(token);
         return true;        
     }
 
