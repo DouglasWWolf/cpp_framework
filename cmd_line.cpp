@@ -20,13 +20,19 @@ void CCmdLine::declare_switch(string name, clp_t swtype)
 
 //==========================================================================================================
 // parse() - Parses the command line
+//
+// Passed: argc           = argc from main()
+//         argv           = argv from main()
+//         throw_on_error = If this is true, errors will be reported via throwing a runtime exception
+//                          instead of by returning true/false
+//
+// Returns: success status
+//          If return value is false, error string can be retrieved by calling "error()"
 //==========================================================================================================
-void CCmdLine::parse(int argc, char** argv)
+bool CCmdLine::parse(int argc, char** argv, bool throw_on_error)
 {
     int i = 0;
-
-    // Fetch the name of this executable
-    const char* exe = argv[0];
+    param_t param;
 
     // Clear any existing command line data we have
     m_switches.clear();
@@ -51,41 +57,53 @@ void CCmdLine::parse(int argc, char** argv)
         // If it's not a valid command-line switch for this program, complain to the user
         if (it == m_valid_switches.end())
         {
-            fprintf(stderr, "%s: %s is not a valid switch!\n", exe, token.c_str());
-            exit(1);
+            m_error = "'" + token + "' is not a valid switch";
+            if (throw_on_error) throw runtime_error(m_error);
+            return false;
         }
 
         // Is the parameter for this switch optional, required, or none?
         clp_t swtype = it->second;
 
         // Presume for the moment that the user didn't supply a switch parameter
-        string switch_param = "";
+        param.value = "";
 
         // Find out if the user supplied a switch parameter
-        bool has_parameter = (argv[i+1] && argv[i+1][0] != '-');
+        param.exists = (argv[i+1] && argv[i+1][0] != '-');
 
         // If this switch doesn't have a parameter and it was supposed to, complain to the user
-        if (!has_parameter && swtype == CLP_REQUIRED)
+        if (!param.exists && swtype == CLP_REQUIRED)
         {
-            fprintf(stderr, "%s: switch %s required a parameter!\n", exe, token.c_str());
-            exit(1);    
+            m_error = "switch '" + token + "' requires a parameter";
+            if (throw_on_error) throw runtime_error(m_error);
+            return false;
         }
 
         // If there is a parameter, and this switch can accept one, fetch it
-        if (has_parameter && (swtype == CLP_REQUIRED || swtype == CLP_OPTIONAL))
+        if (param.exists && (swtype == CLP_REQUIRED || swtype == CLP_OPTIONAL))
         {
-            switch_param = argv[++i];
+            param.value = argv[++i];
         }
 
         // Store the switch and it's parameter (if any)
-        m_switches[token] = switch_param;
+        m_switches[token] = param;
     }
+
+    // No error was encountered
+    m_error.clear();
+
+    // Tell the caller that all is well
+    return true;
 }
 //==========================================================================================================
 
 
+
 //==========================================================================================================
 // has_switch() - Returns 'true' if the specified switch exists on the command line
+//
+// Note: For switches with an optional parameter, *param will only be filled in if the user
+//       supplied a switch parameter on the command line
 //==========================================================================================================
 bool CCmdLine::has_switch(string name, string *param)
 {
@@ -98,8 +116,32 @@ bool CCmdLine::has_switch(string name, string *param)
     // If the user didn't specify this switch on the command line, tell the caller
     if (it == m_switches.end()) return false;
 
-    // Otherwise, the user *did* use this switch.  Hand the caller the switch parameter
-    *param = it->second;
+    // Otherwise, the user *did* use this switch.  If a param exists, hand it to the caller.
+    if (param && it->second.exists) *param = it->second.value;
+
+    // And tell the caller that the specified switch was used on the command line
+    return true;
+}
+//==========================================================================================================
+
+
+
+//==========================================================================================================
+// has_switch() - Returns 'true' if the specified switch exists on the command line
+//==========================================================================================================
+bool CCmdLine::has_switch(string name, int* param)
+{
+    // Make sure that switch names begin with a dash
+    if (name[0] != '-') name = '-' + name;
+
+    // Did the user use the specified switch on the command line?
+    auto it = m_switches.find(name);
+
+    // If the user didn't specify this switch on the command line, tell the caller
+    if (it == m_switches.end()) return false;
+
+    // Otherwise, the user *did* use this switch.  If a param exists, hand it to the caller.
+    if (it->second.exists) *param = stoi(it->second.value, nullptr, 0);
 
     // And tell the caller that the specified switch was used on the command line
     return true;
@@ -110,50 +152,22 @@ bool CCmdLine::has_switch(string name, string *param)
 //==========================================================================================================
 // has_switch() - Returns 'true' if the specified switch exists on the command line
 //==========================================================================================================
-bool CCmdLine::has_switch(string name)
-{
-    string dummy;
-    return has_switch(name, &dummy);
-}
-//==========================================================================================================
-
-
-//==========================================================================================================
-// has_switch() - Returns 'true' if the specified switch exists on the command line
-//==========================================================================================================
-bool CCmdLine::has_switch(string name, int* param)
-{
-    string token;
-
-    // If this switch was used, translate its parameter into an integer
-    if (has_switch(name, &token))
-    {   
-        *param = stoi(token, nullptr, 0);
-        return true;        
-    }
-
-    // If we get here, the switch wasn't used on the command line
-    return false;
-}
-//==========================================================================================================
-
-
-//==========================================================================================================
-// has_switch() - Returns 'true' if the specified switch exists on the command line
-//==========================================================================================================
 bool CCmdLine::has_switch(string name, double* param)
 {
-    string token;
+    // Make sure that switch names begin with a dash
+    if (name[0] != '-') name = '-' + name;
 
-    // If this switch was used, translate its parameter into an floating-point value
-    if (has_switch(name, &token))
-    {   
-        *param = stod(token);
-        return true;        
-    }
+    // Did the user use the specified switch on the command line?
+    auto it = m_switches.find(name);
 
-    // If we get here, the switch wasn't used on the command line
-    return false;
+    // If the user didn't specify this switch on the command line, tell the caller
+    if (it == m_switches.end()) return false;
+
+    // Otherwise, the user *did* use this switch.  If a param exists, hand it to the caller.
+    if (it->second.exists) *param = stod(it->second.value);
+
+    // And tell the caller that the specified switch was used on the command line
+    return true;
 }
 //==========================================================================================================
 
