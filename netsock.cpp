@@ -4,6 +4,7 @@
 #include <unistd.h>
 #include <stdarg.h>
 #include <string.h>
+#include <signal.h>
 #include <netdb.h>
 #include <sys/ioctl.h>
 #include <sys/types.h>
@@ -24,6 +25,9 @@ NetSock::NetSock()
 
     // This socket has not yet been created
     m_is_created = false;
+
+    // Ignore the SIGPIPE exceptions that occur when we write to a closed socket descriptor
+    signal(SIGPIPE, SIG_IGN);
 }
 //==========================================================================================================
 
