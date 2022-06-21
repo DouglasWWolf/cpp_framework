@@ -6,7 +6,7 @@
 #include <vector>
 #include <map>
 
-enum clp_t {CLP_NONE, CLP_MANDATORY, CLP_OPTIONAL};
+enum clp_t {CLP_NONE, CLP_REQUIRED, CLP_OPTIONAL};
 
 class CCmdLine
 {

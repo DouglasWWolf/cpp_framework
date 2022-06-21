@@ -56,7 +56,7 @@ void CCmdLine::parse(int argc, char** argv)
             exit(1);
         }
 
-        // Is the parameter for this switch optional, mandatory, or none?
+        // Is the parameter for this switch optional, required, or none?
         clp_t swtype = it->second;
 
         // Presume for the moment that the user didn't supply a switch parameter
@@ -66,14 +66,14 @@ void CCmdLine::parse(int argc, char** argv)
         bool has_parameter = (argv[i+1] && argv[i+1][0] != '-');
 
         // If this switch doesn't have a parameter and it was supposed to, complain to the user
-        if (!has_parameter && swtype == CLP_MANDATORY)
+        if (!has_parameter && swtype == CLP_REQUIRED)
         {
             fprintf(stderr, "%s: switch %s required a parameter!\n", exe, token.c_str());
             exit(1);    
         }
 
         // If there is a parameter, and this switch can accept one, fetch it
-        if (has_parameter && (swtype == CLP_MANDATORY || swtype == CLP_OPTIONAL))
+        if (has_parameter && (swtype == CLP_REQUIRED || swtype == CLP_OPTIONAL))
         {
             switch_param = argv[++i];
         }
