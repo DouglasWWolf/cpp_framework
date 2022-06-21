@@ -5,6 +5,7 @@
 #include <string>
 #include <vector>
 #include <map>
+#include <stdexcept>
 
 enum clp_t {CLP_NONE, CLP_REQUIRED, CLP_OPTIONAL};
 
