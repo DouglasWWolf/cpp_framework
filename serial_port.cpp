@@ -9,6 +9,7 @@
 #include <stdio.h>
 #include <stdarg.h>
 #include "serial_port.h"
+#include "cvsprintf.h"
 using std::string;
 
 //============================================================================
@@ -222,14 +223,14 @@ bool CSerialPort::get_line(void* buffer, int timeout_ms)
 //============================================================================
 void CSerialPort::printf(const char* fmt, ...)
 {
-    char buffer[1000];
-    va_list args;
+    Cvsprintf vs;
+    va_list   args;
 
     // Get the pointer to the first argument
     va_start(args, fmt);
 
     // Fill "buffer" with the printf output
-    vsprintf(buffer, fmt, args);
+    const char* buffer = vs.printf(fmt, args);
 
     // We're done with the pointer to the first argument
     va_end(args);

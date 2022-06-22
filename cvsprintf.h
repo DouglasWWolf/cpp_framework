@@ -2,6 +2,7 @@
 // Cvsprintf() - A helper object for performing vsprintf without overflowing a buffer
 //==========================================================================================================
 #pragma once
+#include <stdarg.h>
 
 class Cvsprintf
 {
