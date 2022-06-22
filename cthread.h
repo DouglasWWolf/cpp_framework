@@ -122,7 +122,7 @@ public:
 
     // Terminates a thread.  If bWaitFlag is true, it will wait for the
     // thread to finish executing
-    void    cancel(bool bWaitFlag = true);
+    void    cancel(bool wait_flag = true);
 
 
 //----------------------------------------------------------------------------
