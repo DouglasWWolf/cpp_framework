@@ -110,24 +110,3 @@ void CThread::cancel(bool wait_flag)
     if (wait_flag) join();
 }
 //=============================================================================
-
-
-//=============================================================================
-// Constructor() - Initializes the mutex
-//=============================================================================
-CMutex::CMutex()
-{
-    pthread_mutexattr_t attributes;
-
-    // Initialize the mutex attributes
-    pthread_mutexattr_init(&attributes);
-
-    // We want a thread to be able to recursively lock this mutex
-    pthread_mutexattr_settype(&attributes, PTHREAD_MUTEX_RECURSIVE);
-
-    // Create a recursive mutex
-    pthread_mutex_init(&m_mutex, &attributes);
-}
-//=============================================================================
-
-
