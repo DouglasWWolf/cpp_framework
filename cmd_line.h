@@ -47,7 +47,7 @@ protected:
     // We'll use this structure to track which switches had parameters
     struct param_t {bool exists; std::string value;};
 
-    // Maps a command line switch to it's parameter
+    // Maps a command line switch to its parameter
     std::map<std::string, param_t> m_switches;
 
     // This contains all of the non-switch arguments
