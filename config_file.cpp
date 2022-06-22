@@ -1,7 +1,7 @@
 //==========================================================================================================
 // config_file.cpp - Implements a parser for configuration/settings files
 //==========================================================================================================
-#include <cstdio>
+#include <fstream>
 #include <string.h>
 #include "config_file.h"
 using namespace std;
@@ -201,17 +201,17 @@ bool CConfigFile::read(string filename, bool msg_on_fail)
     string parsing_section;
 
     // Open the input file
-    FILE* ifile = fopen(filename.c_str(), "r");
+    ifstream input_file(filename);
 
     // If the input file couldn't be opened, complain about it
-    if (ifile == nullptr)
+    if (!input_file.is_open())
     {
         if (msg_on_fail) printf("Failed to open file \"%s\"\n", filename.c_str());
-        return false;        
-    }
+        return false; 
+    }       
 
     // Loop through every line of the input file...
-    while (fgets(line, sizeof line, ifile))
+    while (input_file.getline(line, sizeof line))
     {
         // Convert tabs to spaces and strip out end-of-line characters
         cleanup(line);
@@ -273,8 +273,7 @@ bool CConfigFile::read(string filename, bool msg_on_fail)
        
     }
 
-    // Close the input file and tell the caller that all is well
-    fclose(ifile);
+    // Tell the caller that all is well
     return true;
 }
 //==========================================================================================================
