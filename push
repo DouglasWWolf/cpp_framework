@@ -1,5 +1,5 @@
 git add README.md
 git add '*.h' '*.cpp' 
-git add push README.md
+git add LICENSE push README.md
 git commit -m "See History.h for changes"
 git push origin main
