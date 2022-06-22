@@ -13,6 +13,7 @@
 #include <netinet/in.h>
 #include <arpa/inet.h>
 #include "netsock.h"
+#include "cvsprintf.h"
 using namespace std;
 
 //==========================================================================================================
@@ -520,7 +521,7 @@ int NetSock::send(const void* buffer, int length)
 //==========================================================================================================
 int NetSock::sendf(const char* fmt, ...)
 {
-    char buffer[2000];
+    Cvsprintf vs;
 
     // This is a pointer to the variable argument list
     va_list ap;
@@ -528,8 +529,8 @@ int NetSock::sendf(const char* fmt, ...)
     // Point to the first argument after the "fmt" parameter
     va_start(ap, fmt);
 
-    // Perform a printf of our arguments into the buffer area;
-    vsprintf(buffer, fmt, ap);
+    // Perform a printf of our arguments into a buffer area;
+    const char* buffer = vs.printf(fmt, ap);
 
     // Tell the system that we're done with the "ap"
     va_end(ap);
