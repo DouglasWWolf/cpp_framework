@@ -120,7 +120,7 @@ public:
     // Call this to join (i.e., merge wait on) this thread
     void    join();
 
-    // Terminates a thread.  If bWaitFlag is true, it will wait for the
+    // Terminates a thread.  If wait_flag is true, it will wait for the
     // thread to finish executing
     void    cancel(bool wait_flag = true);
 
