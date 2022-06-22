@@ -25,9 +25,6 @@ NetSock::NetSock()
 
     // This socket has not yet been created
     m_is_created = false;
-
-    // Ignore the SIGPIPE exceptions that occur when we write to a closed socket descriptor
-    signal(SIGPIPE, SIG_IGN);
 }
 //==========================================================================================================
 
@@ -491,7 +488,7 @@ int NetSock::send(const void* buffer, int length)
     while (bytes_remaining)
     {
         // Attempt to send all of the bytes
-        int sent = ::send(m_sd, ptr, bytes_remaining, 0);
+        int sent = ::send(m_sd, ptr, bytes_remaining, MSG_NOSIGNAL);
 
         // If an error occured, tell the caller
         if (sent < 0) return -1;
