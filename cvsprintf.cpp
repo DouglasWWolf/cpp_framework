@@ -1,7 +1,11 @@
 //==========================================================================================================
 // cvsprintf.cpp - Implements a helper object for performing vsprintf without overflowing a buffer
 //==========================================================================================================
-#pragma once
+#include <string.h>
+#include <stdarg.h>
+#include <stdio.h>
+#include "cvsprintf.h"
+
 
 
 //==========================================================================================================
@@ -40,11 +44,8 @@ char* Cvsprintf::printf(const char* fmt, va_list& ap, const char* prefix, int ex
     // We're going to need to use a buffer on the heap.  If one exists already, destroy it
     if (m_heap)  { delete[] m_heap; m_heap = nullptr; }
 
-    // Our heap buffer must be large enough to hold the entire formatted string, plus "extra"
-    int heap_buffer_length = length
-
     // Allocate enough space on the heap for our entire string (plus the extra bit)
-    m_heap = new char[heap_buffer_length];
+    m_heap = new char[length];
 
     // Point to the place where we intend to store our formatted string
     out = m_heap;
@@ -57,7 +58,7 @@ char* Cvsprintf::printf(const char* fmt, va_list& ap, const char* prefix, int ex
     }
 
     // Now stuff our formatted text into the buffer
-    vsnprintf(out, heap_buffer_length, fmt, ap);
+    vsnprintf(out, length, fmt, ap);
 
     // And hand the caller the pointer to the heap buffer
     return m_heap;
