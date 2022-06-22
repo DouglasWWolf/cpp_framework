@@ -104,10 +104,10 @@ void CThread::terminate()
 //                    complete the teardown process.  If 'false', this
 //                    routine will return immediately
 //=============================================================================
-void CThread::cancel(bool bWaitFlag)
+void CThread::cancel(bool wait_flag)
 {
     pthread_cancel(m_thread);
-    if (bWaitFlag) join();
+    if (wait_flag) join();
 }
 //=============================================================================
 
