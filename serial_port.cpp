@@ -230,7 +230,7 @@ void CSerialPort::printf(const char* fmt, ...)
     va_start(args, fmt);
 
     // Fill "buffer" with the printf output
-    const char* buffer = vs.printf(fmt, args);
+    const char* buffer = vs.printf(fmt, &args);
 
     // We're done with the pointer to the first argument
     va_end(args);
