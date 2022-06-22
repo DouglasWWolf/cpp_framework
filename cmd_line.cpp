@@ -85,7 +85,7 @@ bool CCmdLine::parse(int argc, char** argv, bool throw_on_error)
             param.value = argv[++i];
         }
 
-        // Store the switch and it's parameter (if any)
+        // Store the switch and its parameter (if any)
         m_switches[token] = param;
     }
 
