@@ -279,10 +279,10 @@ string NetSock::get_peer_address(int family)
     // Fetch the IP address of the machine on the other side of the socket
     if (getpeername(m_sd, (sockaddr*)&peer_addr, &addr_size) < 0) return "unknown";
 
-    // Convert that address to an IP address
+    // Convert that address to a human-readable IP address
     inet_ntop(family, &(peer_addr.sin_addr), ip, sizeof(ip));
 
-    // Hand the IP address of the connected client to the caller
+    // Hand the human-readable IP address of the connected client to the caller
     return ip;
 }
 //==========================================================================================================
