@@ -463,9 +463,7 @@ bool NetSock::getline(void* buffer, size_t buff_size)
 //==========================================================================================================
 int NetSock::send(string s)
 {
-    const char* p = s.c_str();
-    int length    = s.size();
-    return send(p, length);
+    return send(s.c_str(), s.size());
 }
 //==========================================================================================================
 
