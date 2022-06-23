@@ -26,6 +26,12 @@ public:
     NetSock();
     ~NetSock() {close();}
 
+    // Copy constructor
+    NetSock(const NetSock& rhs) {copy_object(rhs);}
+    
+    // Assignment 
+    NetSock& operator=(const NetSock& rhs) {copy_object(rhs); return *this;}
+
     // Call this to create a server socket
     bool    create_server(int port, std::string bind_to = "", int family = AF_UNSPEC);
 
@@ -68,8 +74,11 @@ public:
 
 protected:
 
+    // Copy another object of this type
+    void    copy_object(const NetSock& rhs);
+
     std::string m_error_str;
-    int         m_error;
+    int     m_error;
 
     // This will be true on a socket for which create_server() or connect() has been called
     bool    m_is_created;
