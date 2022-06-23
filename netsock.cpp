@@ -406,10 +406,12 @@ int NetSock::receive(void* buffer, int length, bool peek)
 
 //==========================================================================================================
 // getline() - Fetches a line of text from the socket
+//
+// The result buffer doesn't include the terminating carriage-return/linefeed
 //==========================================================================================================
 bool NetSock::getline(void* buffer, size_t buff_size)
 {
-    char c;
+    char c, *ptr, *origin;
 
     // Don't let the caller pass us a buffer size of zero
     if (buff_size == 0) return false;
@@ -417,11 +419,8 @@ bool NetSock::getline(void* buffer, size_t buff_size)
     // Reduce the buffer size by 1 to allow for appending the nul-byte to the end of it
     --buff_size;
 
-    // We'll be keeping track of how many characters are in the buffer
-    int line_length = 0;
-
     // Get a byte pointer to the caller's buffer
-    unsigned char* ptr = (unsigned char*) buffer;
+    origin = ptr = (char*) buffer;
 
     // Loop until either an error or until we see a linefeed
     while (true)
@@ -432,14 +431,10 @@ bool NetSock::getline(void* buffer, size_t buff_size)
         // If it's a carriage-return, throw it away
         if (c == '\r') continue;
 
-        // If it's a backspace, adjust our pointer
+        // Handle backspace, in case the client is a human-being typing
         if (c == 8)
         {
-            if (line_length)
-            {
-                --line_length;
-                --ptr;
-            }
+            if (ptr > origin) --ptr;
             continue;            
         }
 
@@ -447,11 +442,7 @@ bool NetSock::getline(void* buffer, size_t buff_size)
         if (c == '\n') break;
 
         // If this character will fit into the caller's buffer, append it there
-        if (line_length < buff_size)
-        {
-            *ptr++ = c;
-            line_length ++;
-        }
+        if ((ptr - origin) < buff_size) *ptr++ = c;
     }
 
     // We've encountered the end of the line.  Terminate the output string
