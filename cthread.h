@@ -1,67 +1,54 @@
-//=============================================================================
-// CThread() - Encapsulates a linux pthread along with support classes
-//=============================================================================
+//==========================================================================================================
+// cthread.h - Defines a class for conveniently creating worker threads
+//==========================================================================================================
 #pragma once
-#include "pthread.h"
+#include <thread>
 
-
-
-//=============================================================================
-// CThread - Encapsulates a POSIX thread
-//=============================================================================
 class CThread
 {
-//----------------------------------------------------------------------------
-// These routines implement the spawned thread
-//----------------------------------------------------------------------------
-protected:
-
-    friend void* launch_cthread(void*);
-
-    // This is the entry point to the thread when it starts
-    virtual void main(void* p1=0, void* p2=0, void* p3=0) {};
-
-    // Call this to terminate the thread
-    virtual void terminate();
-
-//----------------------------------------------------------------------------
-// These API's are for other threads to interface with this thread
-//----------------------------------------------------------------------------
 public:
 
-    // Default Constructor
+    // Default constructor
     CThread();
 
-    // All base-classes should have virtual destructors
-    virtual  ~CThread() {};
-
     // Call this to spawn the thread
-    int     spawn(void* p1=0, void* p2=0, void* p3=0);
+    void    spawn(const void* p1=0, const void* p2=0, const void* p3=0, const void* p4=0);
 
-    // Call this to manually change the thread ID
-    void    set_thread_id(int id) {m_id = id;}
+    // Call this to join (i.e., wait for the completion of) this thread
+    void    join() {m_thread.join();}
 
-    // Call this to join (i.e., merge wait on) this thread
-    void    join();
+    // Call this to fetch the unique index of this thread
+    int     get_index() {return m_thread_index;}
 
-    // Terminates a thread.  If wait_flag is true, it will wait for the
-    // thread to finish executing
-    void    cancel(bool wait_flag = true);
+    // Call this to over-ride the index that was automatically assigne at construction time
+    void    set_index(int idx) {m_thread_index = idx;}
+
+    // Call this to fetch the number of currently running threads
+    int     running_threads() {return m_running_threads;}
 
 
-//----------------------------------------------------------------------------
-// Thread-local storage
-//----------------------------------------------------------------------------
 protected:
 
-    // The POSIX thread object
-    pthread_t   m_thread;
+    // Over-ride this with the entry-point to your thread
+    virtual void  main() {}
 
-    // The ID of this thread
-    int         m_id;
+    // When main starts up, these are parameters passed in via spawn()
+    void    *m_p1, *m_p2, *m_p3, *m_p4;
 
-    // Global count of the # of CThread objects that have been created
-    static int  m_thread_count;
+    // An integer that refers uniquely to this thread
+    int     m_thread_index;
 
+private:
+
+    // This is a count of running threads
+    static int m_running_threads;
+
+    // This is a count of the number of threads that have been constructed
+    static int m_constructed_threads;
+
+    // This is the actual thread object
+    std::thread m_thread;
+
+    // This is the entry point for the new thread
+    void entry_point();
 };
-//=============================================================================

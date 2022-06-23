@@ -1,112 +1,72 @@
-//=============================================================================
-// CThread.cpp - Implements a class that wraps POSIX threads
-//=============================================================================
-#include <unistd.h>
+//==========================================================================================================
+// cthread.cpp - Implements a base class for conveniently creating worker threads
+//==========================================================================================================
 #include "cthread.h"
+#include <thread>
+#include <mutex>
 
-//=============================================================================
-// This is used to pass information from Spawn() to LaunchThread()
-//=============================================================================
-struct CThreadSpawn
-{
-    CThread*    Object;
-    void        *P1, *P2, *P3;
-    CThreadSpawn(CThread* p, void* p1, void* p2, void* p3)
-    {Object = p; P1 = p1; P2 = p2; P3 = p3;}
-};
-//=============================================================================
+using namespace std;
 
-//=============================================================================
-// This is a count of how many CThread objects have been created
-//=============================================================================
-int CThread::m_thread_count = 0;
-//=============================================================================
+//==========================================================================================================
+// This is a count of how many threads are still running
+//==========================================================================================================
+int CThread::m_running_threads = 0;
+//==========================================================================================================
 
-//=============================================================================
-// launch_cthread() - This is a helper function responsible for actually
-//                    bring the thread into existence.
-//
-// Passed: ThreadPtr = Pointer to a CThreadSpawn object *ON THE HEAP*.
-//                     When this routine is done, it will automatically
-//                     free the memory used by this CThreadSpawn object
-//
-//=============================================================================
-void* launch_cthread(void* thread_ptr)
-{
-    // Turn the passed parameter into a pointer of the correct type
-    CThreadSpawn *p = (CThreadSpawn*)thread_ptr;
 
-    // Spin up "main()" in our new thread.  When this returns, the thread
-    // is done executing
-    p->Object->main(p->P1, p->P2, p->P3);
+//==========================================================================================================
+// This is a count of how many threads have been constructed
+//==========================================================================================================
+int CThread::m_constructed_threads = 0;
+//==========================================================================================================
 
-    // Free up the memory that was allocated during Spawn()
-    delete p;
 
-    // There's nothing to hand back to the caller
-    return nullptr;
-}
-//=============================================================================
-
-//=============================================================================
-// Default constructor
-//=============================================================================
+//==========================================================================================================
+// Constructor() - Assigns a unique index number to this thread
+//==========================================================================================================
 CThread::CThread()
 {
-    // The default Thread ID is the # of CThread objects that have been
-    // constructed previous to this one. A different Thread ID can be set
-    // manually by calling set_thread_id();
-    m_id = m_thread_count++;
+    m_thread_index = ++m_constructed_threads;
 }
-//=============================================================================
+//==========================================================================================================
 
-//=============================================================================
-// spawn() - Called in order to start this thread
-//=============================================================================
-int CThread::spawn(void* P1, void* P2, void* P3)
+
+//==========================================================================================================
+// entry_point() - This is the entry point when a thread is spawned
+//==========================================================================================================
+void CThread::entry_point()
 {
-    // Create the parameter object that controls LaunchThread()
-    CThreadSpawn *params = new CThreadSpawn(this, P1, P2, P3);
+    static mutex mtx;
+    
+    // We now have one more thread running
+    mtx.lock();
+    ++m_running_threads;
+    mtx.unlock();
 
-    // Spin up the thread
-    int ret = pthread_create(&m_thread, NULL, launch_cthread, (void*) params);
-
-    // Tell the caller if it worked
-    return ret;
+    // Start main() in the dervied class
+    main();
+    
+    // We now have one fewer threads running
+    mtx.lock();
+    --m_running_threads;
+    mtx.unlock();
 }
-//=============================================================================
+//==========================================================================================================
 
-//=============================================================================
-// join() - join (i.e., wait on) this thread
-//=============================================================================
-void CThread::join()
+
+//==========================================================================================================
+// spawn() - Spawns the thread
+//==========================================================================================================
+void CThread::spawn(const void* p1, const void* p2, const void* p3, const void* p4)
 {
-    // Wait for this thread to complete
-    pthread_join(m_thread, NULL);
-}
-//=============================================================================
+    // Fill in the startup parameters
+    m_p1 = (void*)p1;
+    m_p2 = (void*)p2;
+    m_p3 = (void*)p3;
+    m_p4 = (void*)p4;
 
-
-//=============================================================================
-// terminate() - Terminates this thread.  Should only be called internally to
-//               this thread!!
-//=============================================================================
-void CThread::terminate()
-{
-    pthread_exit(NULL);
+    // Spin up "entry_point" 
+    m_thread = std::thread(&CThread::entry_point, this);
 }
-//=============================================================================
+//==========================================================================================================
 
-//=============================================================================
-// cancel() - Terminates and tears down the thread.
-//
-// Passed: bWaitFlag: if 'true', this routine will wait for the thread to
-//                    complete the teardown process.  If 'false', this
-//                    routine will return immediately
-//=============================================================================
-void CThread::cancel(bool wait_flag)
-{
-    pthread_cancel(m_thread);
-    if (wait_flag) join();
-}
-//=============================================================================
