@@ -57,7 +57,7 @@ public:
     int     receive(void* buffer, int length, bool peek = false);
 
     // Call this to fetch a line of text from the socket
-    bool    get_line(void* buffer, size_t buff_size);
+    bool    getline(void* buffer, size_t buff_size);
 
     // Call these to send a string or buffer full of data
     int     send(std::string s);
@@ -77,6 +77,7 @@ protected:
     // Copy another object of this type
     void    copy_object(const NetSock& rhs);
 
+    // Most recent error
     std::string m_error_str;
     int     m_error;
 

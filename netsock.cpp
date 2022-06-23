@@ -405,9 +405,9 @@ int NetSock::receive(void* buffer, int length, bool peek)
 
 
 //==========================================================================================================
-// get_line() - Fetches a line of text from the socket
+// getline() - Fetches a line of text from the socket
 //==========================================================================================================
-bool NetSock::get_line(void* buffer, size_t buff_size)
+bool NetSock::getline(void* buffer, size_t buff_size)
 {
     char c;
 
