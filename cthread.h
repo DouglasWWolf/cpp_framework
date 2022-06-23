@@ -20,7 +20,7 @@ public:
     // Call this to fetch the unique index of this thread
     int     get_index() {return m_thread_index;}
 
-    // Call this to over-ride the index that was automatically assigne at construction time
+    // Call this to over-ride the index that was automatically assigned at construction time
     void    set_index(int idx) {m_thread_index = idx;}
 
     // Call this to fetch the number of currently running threads
