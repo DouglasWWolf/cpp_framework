@@ -59,7 +59,7 @@ public:
     bool    read(std::string filename, bool msg_on_fail = true);
 
     // Call this to set the name of section to use for name scoping
-    void    set_current_section(std::string section) {m_current_section = section;}
+    void    set_current_section(std::string section);
 
     // Call this to determine whether an exception is thrown when trying to fetch an unknown key
     void    throw_on_fail(bool flag = true) {m_throw_on_fail = flag;}

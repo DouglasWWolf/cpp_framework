@@ -280,6 +280,17 @@ bool CConfigFile::read(string filename, bool msg_on_fail)
 
 
 //==========================================================================================================
+// set_current_section() - Sets the section-name to look for keys in
+//==========================================================================================================
+void  CConfigFile::set_current_section(string section)
+{
+    m_current_section = section;
+    make_lower(m_current_section);
+}
+//==========================================================================================================
+
+
+//==========================================================================================================
 // dump_specs() - Displays the m_specs map in human-readable form for debugging
 //==========================================================================================================
 void CConfigFile::dump_specs()
